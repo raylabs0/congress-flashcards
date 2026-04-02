@@ -464,7 +464,7 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col items-center py-6 px-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-6 px-4">
       <Confetti particles={confettiParticles} />
 
       <div className="w-full max-w-sm flex flex-col h-full">
@@ -474,7 +474,7 @@ export default function Home() {
           <h1 className="text-xl font-bold text-gray-700">US Congress Face and Name Flashcards</h1>
           <button
             onClick={handleOpenSettings}
-            className="text-sm text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+            className="text-xs text-gray-500 border border-gray-300 rounded-lg px-3 py-1 hover:bg-gray-100 transition-colors cursor-pointer"
           >
             Reset
           </button>
@@ -601,6 +601,7 @@ export default function Home() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleSubmit() }}
+              onFocus={(e) => e.target.scrollIntoView({ behavior: 'smooth', block: 'end' })}
               placeholder="Type their name..."
               className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 mb-3"
             />
