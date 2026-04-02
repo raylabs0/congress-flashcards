@@ -16,12 +16,6 @@ export const metadata = {
   description: "Learn the faces of Congress",
 };
 
-export const viewport = {
-  width: "device-width",
-  initialScale: 1,
-  interactiveWidget: "resizes-content",
-};
-
 export default function RootLayout({ children }) {
   return (
     <html
