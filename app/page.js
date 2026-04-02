@@ -593,9 +593,9 @@ export default function Home() {
           </div>
         )}
 
-        {/* Input + Submit — pinned to bottom on mobile */}
+        {/* Input + Submit — shown before guessing */}
         {!feedback && (
-          <div className="fixed bottom-0 left-0 right-0 bg-gray-50 px-4 pb-8 pt-3 max-w-sm mx-auto">
+          <>
             <input
               type="text"
               value={inputValue}
@@ -611,7 +611,7 @@ export default function Home() {
             >
               reveal answer
             </button>
-          </div>
+          </>
         )}
 
       </div>
