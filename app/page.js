@@ -141,6 +141,15 @@ export default function Home() {
   const [starPopped, setStarPopped] = useState(false)
 
   const nextButtonRef = useRef(null)
+  const [viewportHeight, setViewportHeight] = useState(null)
+
+  // Shrink layout when iOS keyboard appears
+  useEffect(() => {
+    const update = () => setViewportHeight(window.visualViewport?.height ?? window.innerHeight)
+    update()
+    window.visualViewport?.addEventListener('resize', update)
+    return () => window.visualViewport?.removeEventListener('resize', update)
+  }, [])
 
   // Fetch all members from the Congress.gov API on first load
   useEffect(() => {
@@ -464,7 +473,7 @@ export default function Home() {
   }
 
   return (
-    <div className="h-[100dvh] overflow-hidden bg-gray-50 flex flex-col items-center py-6 px-4">
+    <div className="overflow-hidden bg-gray-50 flex flex-col items-center py-6 px-4" style={{ height: viewportHeight ?? '100dvh' }}>
       <Confetti particles={confettiParticles} />
 
       <div className="w-full max-w-sm flex flex-col h-full min-h-0">
