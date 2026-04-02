@@ -464,10 +464,10 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-6 px-4">
+    <div className="h-[100dvh] overflow-hidden bg-gray-50 flex flex-col items-center py-6 px-4">
       <Confetti particles={confettiParticles} />
 
-      <div className="w-full max-w-sm flex flex-col h-full">
+      <div className="w-full max-w-sm flex flex-col h-full min-h-0">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-1">
@@ -508,7 +508,7 @@ export default function Home() {
         {/* Photo card — shows photo before guessing, name after */}
         <div
           className={`relative rounded-2xl shadow-md overflow-hidden mb-4 ${popActive ? "card-pop" : ""}`}
-          style={{ ...cardStyle, height: '280px' }}
+          style={{ ...cardStyle, flex: '1 1 0', minHeight: 0, maxHeight: '280px' }}
         >
           {starredHydrated && (
             <button
