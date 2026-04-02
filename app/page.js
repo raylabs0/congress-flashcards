@@ -593,15 +593,14 @@ export default function Home() {
           </div>
         )}
 
-        {/* Input + Submit — shown before guessing */}
+        {/* Input + Submit — pinned to bottom on mobile */}
         {!feedback && (
-          <>
+          <div className="fixed bottom-0 left-0 right-0 bg-gray-50 px-4 pb-8 pt-3 max-w-sm mx-auto">
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") handleSubmit() }}
-              onFocus={(e) => e.target.scrollIntoView({ behavior: 'smooth', block: 'end' })}
               placeholder="Type their name..."
               className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 mb-3"
             />
@@ -612,7 +611,7 @@ export default function Home() {
             >
               reveal answer
             </button>
-          </>
+          </div>
         )}
 
       </div>
