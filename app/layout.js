@@ -14,6 +14,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Congress Flashcards",
   description: "For congressional reporters who need to learn the faces of the current US Congress",
+  verification: {
+    google: "fzDNuuOdJKE4Uqq4Q3ccrB02fyV6tjBNraB_aQ-dUGc",
+  },
 };
 
 export default function RootLayout({ children }) {
