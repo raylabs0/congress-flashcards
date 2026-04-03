@@ -302,7 +302,7 @@ export default function Home() {
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-10">
         <div className="w-full max-w-sm">
           <h1 className="text-2xl font-bold text-gray-800 mb-1">US Congress Face and Name Flashcards</h1>
-          <p className="text-gray-400 mb-8">For congressional reporters</p>
+          <p className="text-gray-400 mb-8">For congressional reporters who need to learn the faces of the current US Congress</p>
 
           {/* Party filter */}
           <p className="text-sm font-semibold text-gray-500 mb-2">Party</p>
