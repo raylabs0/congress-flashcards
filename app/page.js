@@ -11,10 +11,16 @@ function applyFilters(members, filters, starredIds = new Set()) {
     if (filters.party !== "all" && m.party !== filters.party) return false
     if (filters.chamber !== "all" && m.chamber !== filters.chamber) return false
     if (filters.committee !== "all" && !m.committees.includes(filters.committee)) return false
+    if (filters.states.length > 0 && !filters.states.includes(m.state)) return false
     if (filters.freshmenOnly && !m.freshmen) return false
     if (filters.starredOnly && !starredIds.has(m.id)) return false
     return true
   })
+}
+
+// Returns a sorted list of every unique state across all members
+function getAllStates(members) {
+  return [...new Set(members.map(m => m.state))].sort()
 }
 
 // Returns a sorted list of every unique committee across all members
@@ -117,11 +123,12 @@ function FilterChip({ label, selected, onClick }) {
   )
 }
 
-const DEFAULT_FILTERS = { party: "all", chamber: "all", committee: "all", freshmenOnly: false, starredOnly: false }
+const DEFAULT_FILTERS = { party: "all", chamber: "all", committee: "all", states: [], freshmenOnly: false, starredOnly: false }
 
 export default function Home() {
   const [screen, setScreen] = useState("filters") // "filters" | "quiz"
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
+  const [stateFilterOpen, setStateFilterOpen] = useState(false)
   const [allMembers, setAllMembers] = useState([])
   const [loadingMembers, setLoadingMembers] = useState(true)
   const [fetchError, setFetchError] = useState(null)
@@ -348,6 +355,50 @@ export default function Home() {
               ))}
             </select>
             <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">▼</span>
+          </div>
+
+          {/* State filter */}
+          <p className="text-sm font-semibold text-gray-500 mb-2">State</p>
+          <div className="mb-6">
+            <button
+              onClick={() => setStateFilterOpen(o => !o)}
+              className="w-full text-left appearance-none bg-white border-2 rounded-xl px-4 py-2 text-sm font-semibold focus:outline-none cursor-pointer flex justify-between items-center"
+              style={{
+                borderColor: filters.states.length > 0 ? COLORS.blue : "#e5e7eb",
+                color: filters.states.length > 0 ? COLORS.blue : "#6b7280",
+              }}
+            >
+              <span>
+                {filters.states.length === 0
+                  ? "All states"
+                  : filters.states.length <= 3
+                    ? filters.states.join(", ")
+                    : `${filters.states.slice(0, 3).join(", ")} +${filters.states.length - 3}`}
+              </span>
+              <span className="text-gray-400 text-xs">{stateFilterOpen ? "▲" : "▼"}</span>
+            </button>
+            {stateFilterOpen && (
+              <div className="mt-2 bg-white border-2 border-gray-100 rounded-xl p-3">
+                <div className="flex flex-wrap gap-2">
+                  <FilterChip
+                    label="All"
+                    selected={filters.states.length === 0}
+                    onClick={() => setFilters(f => ({ ...f, states: [] }))}
+                  />
+                  {getAllStates(allMembers).map(state => (
+                    <FilterChip
+                      key={state}
+                      label={state}
+                      selected={filters.states.includes(state)}
+                      onClick={() => setFilters(f => {
+                        const already = f.states.includes(state)
+                        return { ...f, states: already ? f.states.filter(s => s !== state) : [...f.states, state] }
+                      })}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Freshmen filter */}
