@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Congress Flashcards",
-  description: "Learn the faces of Congress",
+  description: "For congressional reporters who need to learn the faces of the current US Congress",
 };
 
 export default function RootLayout({ children }) {
