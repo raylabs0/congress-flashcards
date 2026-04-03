@@ -123,12 +123,14 @@ function FilterChip({ label, selected, onClick }) {
   )
 }
 
-const DEFAULT_FILTERS = { party: "all", chamber: "all", committee: "all", states: [], freshmenOnly: false, starredOnly: false }
+const DEFAULT_FILTERS = { mode: "type", party: "all", chamber: "all", committee: "all", states: [], freshmenOnly: false, starredOnly: false }
 
 export default function Home() {
   const [screen, setScreen] = useState("filters") // "filters" | "quiz"
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [stateFilterOpen, setStateFilterOpen] = useState(false)
+  const [quizMode, setQuizMode] = useState("type") // "type" | "flip"
+  const [flipped, setFlipped] = useState(false)
   const [allMembers, setAllMembers] = useState([])
   const [loadingMembers, setLoadingMembers] = useState(true)
   const [fetchError, setFetchError] = useState(null)
@@ -221,6 +223,8 @@ export default function Home() {
     setStreak(0)
     setPopActive(false)
     setConfettiParticles([])
+    setFlipped(false)
+    setQuizMode(withFilters.mode)
     setScreen("quiz")
   }
 
@@ -255,6 +259,7 @@ export default function Home() {
     setCurrentIndex((i) => i + 1)
     setInputValue("")
     setFeedback(null)
+    setFlipped(false)
     setShowPhotoToggle(false)
     setStarPopped(false)
   }
@@ -310,6 +315,21 @@ export default function Home() {
         <div className="w-full max-w-sm">
           <h1 className="text-2xl font-bold text-gray-800 mb-1">US Congress Face and Name Flashcards</h1>
           <p className="text-gray-400 mb-8">For congressional reporters who need to learn the faces of the current US Congress</p>
+
+          {/* Mode toggle */}
+          <p className="text-sm font-semibold text-gray-500 mb-2">Mode</p>
+          <div className="flex gap-2 mb-6">
+            <FilterChip
+              label="Type the name"
+              selected={filters.mode === "type"}
+              onClick={() => setFilters(f => ({ ...f, mode: "type" }))}
+            />
+            <FilterChip
+              label="Flip card"
+              selected={filters.mode === "flip"}
+              onClick={() => setFilters(f => ({ ...f, mode: "flip" }))}
+            />
+          </div>
 
           {/* Party filter */}
           <p className="text-sm font-semibold text-gray-500 mb-2">Party</p>
@@ -457,12 +477,14 @@ export default function Home() {
           <div className="text-center mb-6">
             <p className="text-5xl mb-4">🎉</p>
             <h2 className="text-2xl font-bold text-gray-800 mb-1">You finished the deck!</h2>
-            <p className="text-gray-500">
-              {correct} correct · {total - correct} wrong · out of {total}
-            </p>
+            {quizMode === "type" && (
+              <p className="text-gray-500">
+                {correct} correct · {total - correct} wrong · out of {total}
+              </p>
+            )}
           </div>
 
-          {missed.length > 0 && (
+          {quizMode === "type" && missed.length > 0 && (
             <div className="bg-white rounded-2xl shadow-sm p-4 mb-6 text-left overflow-y-auto flex-1">
               <p className="text-sm font-semibold text-gray-500 mb-2">Ones you missed:</p>
               <ul className="space-y-1">
@@ -474,7 +496,7 @@ export default function Home() {
           )}
 
           <div className="flex flex-col gap-3">
-            {missed.length > 0 && (
+            {quizMode === "type" && missed.length > 0 && (
               <Button3D onClick={handleRetryMissed}>
                 Retry missed ({missed.length})
               </Button3D>
@@ -516,7 +538,7 @@ export default function Home() {
 
   return (
     <div className="h-screen bg-gray-50 flex flex-col items-center py-6 px-4">
-      <Confetti particles={confettiParticles} />
+      {quizMode === "type" && <Confetti particles={confettiParticles} />}
 
       <div className="w-full max-w-sm flex flex-col h-full">
 
@@ -534,7 +556,7 @@ export default function Home() {
         {/* Card count + streak */}
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm text-gray-400">Card {currentIndex + 1} of {deck.length}</p>
-          {streak > 0 && (
+          {quizMode === "type" && streak > 0 && (
             <div className="flex items-center gap-1">
               <Lottie
                 animationData={fireAnimation}
@@ -591,7 +613,22 @@ export default function Home() {
               {starredIds.has(member.id) ? '⭐' : '☆'}
             </button>
           )}
-          {feedback && !showPhotoToggle ? (
+          {quizMode === "flip" && !flipped ? (
+            <button
+              onClick={() => setFlipped(true)}
+              className="w-full h-full flex flex-col items-center justify-center p-6 cursor-pointer"
+            >
+              <img
+                src={member.photoUrl}
+                alt="Congress member"
+                className="w-full h-full object-contain"
+                onError={(e) => { e.target.src = "https://placehold.co/400x500/d1d5db/6b7280?text=No+Photo" }}
+              />
+              <div className="absolute bottom-3 left-0 right-0 flex justify-center">
+                <span className="bg-black/40 text-white text-xs px-3 py-1 rounded-full">Tap to reveal</span>
+              </div>
+            </button>
+          ) : (feedback || flipped) && !showPhotoToggle ? (
             <button
               onClick={() => setShowPhotoToggle(true)}
               className="w-full h-full flex flex-col items-center justify-center p-6 cursor-pointer"
@@ -603,15 +640,15 @@ export default function Home() {
             <img
               src={member.photoUrl}
               alt="Congress member"
-              className={`w-full h-full object-contain ${feedback ? "cursor-pointer" : ""}`}
-              onClick={() => feedback && setShowPhotoToggle(false)}
+              className={`w-full h-full object-contain ${(feedback || flipped) ? "cursor-pointer" : ""}`}
+              onClick={() => (feedback || flipped) && setShowPhotoToggle(false)}
               onError={(e) => { e.target.src = "https://placehold.co/400x500/d1d5db/6b7280?text=No+Photo" }}
             />
           )}
         </div>
 
-        {/* Facts panel + Next button — shown after guessing */}
-        {feedback && (
+        {/* Facts panel + Next button — shown after guessing (type mode) or after flip (flip mode) */}
+        {(feedback || flipped) && (
           <div className="flex flex-col gap-4 flex-1 min-h-0">
             <div className="overflow-y-auto min-h-0">
               <div className="bg-white rounded-2xl shadow-sm p-4 space-y-2 text-sm text-gray-700" style={{ border: '1px solid #f3f4f6' }}>
@@ -644,8 +681,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* Input + Submit — shown before guessing */}
-        {!feedback && (
+        {/* Input + Submit — shown before guessing, type mode only */}
+        {!feedback && quizMode === "type" && (
           <>
             <input
               type="text"
